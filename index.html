@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+<!-- ICON APP -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Icône iPhone -->
+  <link rel="apple-touch-icon" href="icon.png">
+
+  <!-- MANIFEST -->
+  <link rel="manifest" href="manifest.json">
+
+  <title>Step Library</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0a0a0a;
+  color: white;
+}
+
+/* HEADER */
+.header {
+  text-align: center;
+  padding: 25px 20px 10px;
+  position: relative;
+}
+
+/* SEARCH ICON */
+.search-icon {
+  position: absolute;
+  right: 20px;
+  top: 25px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* OVERLAY */
+.search-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
+  display: none;
+  z-index: 10;
+}
+
+/* INPUT */
+.search-overlay input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  font-size: 16px;
+}
+
+.title {
+  font-size: 45px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  transform: rotate(-2deg);
+}
+
+.subtitle {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-top: 10px;
+}
+
+/* CATEGORY PILLS */
+.categories {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 15px 20px;
+}
+
+.cat {
+  padding: 8px 15px;
+  border-radius: 20px;
+  color: rgb(255, 255, 255);
+  background: #1a1a1a;
+  white-space: nowrap;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.cat.active {
+  background: #d9ff57;
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+}
+
+/* STEP CARDS */
+.list {
+  padding: 10px 15px 30px;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  background: #121212;
+  border-radius: 18px;
+  margin-bottom: 15px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+/* IMAGE */
+.thumb {
+  width: 45%;
+  height: 100px;
+  object-fit: cover;
+}
+
+/* TEXT SIDE */
+.content {
+  padding: 10px;
+  flex: 1;
+}
+
+.step-name {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.step-desc {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 5px;
+}
+
+/* NO RESULT ICON */
+.no-results {
+  display: none;
+  text-align: center;
+  padding: 40px 20px;
+  opacity: 0.6;
+}
+
+.no-results .icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+/* OPTIONAL GRAFFITI EFFECT */
+.title, .step-name {
+  font-family: Impact, Arial Black, sans-serif;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="title">STEP LIBRARY</div>
+  <div class="subtitle">Hip-Hop Dictionary Learning Platform</div>
+  <div class="search-icon" onclick="toggleSearch()">🔍</div>
+</div>
+
+<div class="search-overlay" id="searchOverlay">
+  <input type="text" id="searchInput" placeholder="Search step..." />
+</div>
+
+<div class="categories">
+  <div class="cat active" onclick="filterCategory('all', this)">ALL</div>
+  <div class="cat" onclick="filterCategory('hiphop', this)">HIP HOP</div>
+  <div class="cat" onclick="filterCategory('popping', this)">POPPING</div>
+  <div class="cat" onclick="filterCategory('locking', this)">LOCKING</div>
+</div>
+
+<div class="list" id="list">
+  
+  <!-- NO RESULT (FIRST CHILD) -->
+  <div id="noResults" class="no-results">
+    <div class="icon">🔍</div>
+    <div>No steps found</div>
+  </div>
+
+  <div class="card" data-category="popping" onclick="openStep('fresno.html')">
+    <img class="thumb" src="https://images.unsplash.com/photo-1520975916090-3105956dac38" />
+    <!-- CONTENT -->
+    <div class="content">
+      <div class="step-name">FRESNO</div>
+      <div class="step-desc">Essential popping step</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let currentCategory = "all";
+
+/* CLICK → OPEN PAGE */
+function openStep(page) {
+  window.location.href = page;
+}
+
+/* CATEGORY FILTER */
+function filterCategory(category, element) {
+  currentCategory = category;
+
+  document.querySelectorAll('.cat').forEach(c => c.classList.remove('active'));
+  element.classList.add('active');
+
+  applyFilters();
+}
+
+//* SEARCH BAR *//
+let searchOpen = false;
+
+function toggleSearch() {
+  const overlay = document.getElementById("searchOverlay");
+
+  searchOpen = !searchOpen;
+
+  overlay.style.display = searchOpen ? "block" : "none";
+
+  if (searchOpen) {
+    document.getElementById("searchInput").focus();
+  }
+}
+
+/* CLOSE when clicking outside */
+document.addEventListener("click", function(e) {
+  const overlay = document.getElementById("searchOverlay");
+  const icon = document.querySelector(".search-icon");
+
+  if (
+    searchOpen &&
+    !overlay.contains(e.target) &&
+    !icon.contains(e.target)
+  ) {
+    overlay.style.display = "none";
+    searchOpen = false;
+  }
+});
+
+/* MEDIA PLAYER PREVIEW */
+document.querySelectorAll(".card").forEach(card => {
+  const video = card.querySelector(".video");
+
+  card.addEventListener("mouseenter", () => {
+    if (video) video.play();
+  });
+
+  card.addEventListener("mouseleave", () => {
+    if (video) {
+      video.pause();
+      video.currentTime = 0;
+    }
+  });
+});
+
+/* SEARCH LOGIC */
+document.getElementById("searchInput").addEventListener("input", applyFilters);
+
+/* FILTER LOGIC */
+function applyFilters() {
+  let searchValue = document.getElementById("searchInput").value.toLowerCase();
+  let cards = document.querySelectorAll(".card");
+  let visibleCount = 0;
+
+  cards.forEach(card => {
+    let name = card.querySelector(".step-name").innerText.toLowerCase();
+    let category = card.getAttribute("data-category");
+
+    let matchSearch = name.includes(searchValue);
+    let matchCategory = currentCategory === "all" || category === currentCategory;
+
+    if (matchSearch && matchCategory) {
+      card.style.display = "flex";
+      visibleCount++;
+    } else {
+      card.style.display = "none";
+    }
+  });
+
+  const noResults = document.getElementById("noResults");
+
+  if (visibleCount === 0) {
+    noResults.style.display = "block";
+  } else {
+    noResults.style.display = "none";
+  }
+}
+</script>
+
+</body>
+</html>
