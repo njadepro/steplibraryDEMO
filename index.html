@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Access</title>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: #0a0a0a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      letter-spacing: 2px;
+    }
+
+    input {
+      padding: 12px;
+      width: 260px;
+      border: none;
+      outline: none;
+      margin: 15px 0;
+      background: #111;
+      color: white;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 12px 25px;
+      border: none;
+      background: #e50914;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #ff1a1a;
+    }
+
+    #error {
+      color: red;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>ENTER ACCESS</h1>
+
+    <input 
+      type="password" 
+      id="password" 
+      placeholder="Password"
+    >
+
+    <br>
+
+    <button onclick="checkPassword()">ENTER</button>
+
+    <div id="error"></div>
+  </div>
+
+  <script>
+    // 🔐 MOT DE PASSE
+    const PASSWORD = "STEP";
+
+    window.onload = () => {
+      const input = document.getElementById("password");
+
+      // 🎯 Focus direct
+      input.focus();
+
+      // ⌨️ Enter = valider
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          checkPassword();
+        }
+      });
+    };
+
+    function checkPassword() {
+      const input = document.getElementById("password");
+      const error = document.getElementById("error");
+
+      if (input.value === PASSWORD) {
+        // ✅ session temporaire
+        sessionStorage.setItem("accessGranted", "true");
+
+        // 👉 redirection
+        window.location.replace("steplibrary.html");
+
+      } else {
+        error.textContent = "Wrong password";
+        input.value = "";
+        input.focus();
+      }
+    }
+  </script>
+
+</body>
+</html>
