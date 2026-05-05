@@ -236,9 +236,18 @@ let beatCount = 0;
 
 /* AUDIO */
 const AudioContext = window.AudioContext || window.webkitAudioContext;
-const audioCtx = new AudioContext();
+let audioCtx;
 const beatsPerWord = 4;
-
+  
+function initAudio(){
+  if(!audioCtx){
+    audioCtx = new AudioContext();
+  }
+  if(audioCtx.state === "suspended"){
+    audioCtx.resume();
+  }
+}
+  
 /* 🔥 CLEAN KICK (soft 808 style) */
 function playClick(){
   if(!clickOn) return;
@@ -252,21 +261,27 @@ function playClick(){
   o.frequency.setValueAtTime(140, audioCtx.currentTime);
   o.frequency.exponentialRampToValueAtTime(45, audioCtx.currentTime + 0.12);
 
-  g.gain.setValueAtTime(0.6, audioCtx.currentTime);
+  g.gain.setValueAtTime(0.35, audioCtx.currentTime);
   g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
 
   o.connect(g);
   g.connect(audioCtx.destination);
 
   o.start();
-  o.stop(audioCtx.currentTime + 0.18);
+  o.stop(audioCtx.currentTime + 0.2);
 }
 
 function speak(t){
+  if(!("speechSynthesis" in window)) return;
+
+  speechSynthesis.cancel();
+
   const u = new SpeechSynthesisUtterance(t);
   u.lang = "fr-FR";
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
+
+  setTimeout(() => {
+    speechSynthesis.speak(u);
+  }, 50);
 }
 
 /* DATA */
@@ -285,6 +300,8 @@ function toggleGame(){
 }
 
 function startGame(){
+  initAudio();
+  
   running = true;
   document.getElementById("mainBtn").innerText = "STOP";
 
