@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SWITCH RYTHMIQUE</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#000;
+  color:#fff;
+  overflow:hidden;
+}
+
+/* ===== LAYERS ===== */
+
+/* TOP */
+.top{
+  position:fixed;
+  top:0;left:0;right:0;
+  height:60px;
+  z-index:30;
+
+  display:flex;
+  align-items:center;
+
+  background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.back{
+  width:60px;
+  text-align:center;
+  font-size:20px;
+  cursor:pointer;
+}
+
+.title{
+  flex:1;
+  text-align:center;
+  font-weight:bold;
+}
+
+/* MODES */
+.modes{
+  position:fixed;
+  top:60px;
+  left:0;right:0;
+  z-index:25;
+
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+
+  background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.mode{
+  font-size:12px;
+  opacity:0.4;
+  cursor:pointer;
+}
+
+.mode.active{
+  opacity:1;
+  color:#1e90ff;
+}
+
+/* CENTER */
+.center{
+  position:fixed;
+  top:0;bottom:0;left:0;right:0;
+  z-index:5;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:18px;
+}
+
+/* READY */
+#readyText{
+  position:absolute;
+  top:50%;
+  transform:translateY(-140%);
+  font-size:34px;
+  font-weight:bold;
+  letter-spacing:2px;
+  z-index:15;
+  pointer-events:none;
+}
+
+/* GRID */
+#grid{
+  display:grid;
+  grid-template-columns:repeat(4,55px);
+  grid-template-rows:repeat(4,55px);
+  gap:8px;
+
+  position:relative;
+  z-index:1;
+}
+
+.cell{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:6px;
+  transition:0.15s;
+}
+
+.cell.active{
+  background:#1e90ff;
+}
+
+body.custom-mode .cell{
+  background:rgba(255,255,255,0.10);
+  border:1px solid rgba(255,255,255,0.25);
+}
+
+body.custom-mode .cell.active{
+  background:#1e90ff;
+  box-shadow:0 0 14px rgba(30,144,255,0.9);
+}
+
+/* REP BAR */
+.rep-bar{
+  display:flex;
+  gap:10px;
+  font-size:12px;
+
+  position:relative;
+  z-index:10;
+}
+
+.rep{
+  padding:6px 10px;
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.rep.active{
+  background:#1e90ff;
+  border-color:#1e90ff;
+}
+
+/* BUTTON */
+#btn{
+  padding:12px 22px;
+  border:none;
+  border-radius:10px;
+  background:#1e90ff;
+  color:#fff;
+}
+
+/* BOTTOM */
+.bottom{
+  position:fixed;
+  bottom:0;left:0;right:0;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  z-index: 10;
+
+  padding:12px 14px;
+
+  background:rgba(0,0,0,0.65);
+  backdrop-filter:blur(12px);
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+
+/* BPM layout */
+.bpm-control{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+/* TAP BUTTON (library style pill) */
+.tap{
+  padding:8px 12px;
+  border-radius:999px;
+
+  font-size:11px;
+  letter-spacing:1px;
+
+  background:rgba(30,144,255,0.15);
+  border:1px solid rgba(30,144,255,0.4);
+  color:#1e90ff;
+
+  cursor:pointer;
+  user-select:none;
+}
+
+/* BPM TEXT */
+.bpm-read{
+  display:flex;
+  flex-direction:column;
+  line-height:1.1;
+  font-size:11px;
+  opacity:0.8;
+}
+
+#bpmValue{
+  font-size:14px;
+  font-weight:bold;
+  color:#fff;
+}
+
+/* SLIDER (modern minimal) */
+input[type="range"]{
+  width:140px;
+  accent-color:#1e90ff;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- TOP -->
+<div class="top">
+  <div class="back" onclick="goHome()">←</div>
+  <div class="title">SWITCH RYTHMIQUE</div>
+  <div style="width:60px"></div>
+</div>
+
+<!-- MODES -->
+<div class="modes">
+  <div class="mode active" onclick="setMode('random',this)">RANDOM</div>
+  <div class="mode" onclick="setMode('custom',this)">CUSTOM</div>
+</div>
+
+<!-- CENTER -->
+<div class="center">
+
+  <div id="readyText">READY</div>
+
+  <div id="grid"></div>
+
+  <div class="rep-bar">
+    <div class="rep active" onclick="setRepeat(4,this)">x4</div>
+    <div class="rep" onclick="setRepeat(8,this)">x8</div>
+    <div class="rep" onclick="setRepeat(16,this)">x16</div>
+  </div>
+
+  <button id="btn" onclick="toggle()">START</button>
+
+</div>
+
+<!-- BOTTOM -->
+<div class="bottom">
+
+  <div class="bpm-control">
+
+    <div class="tap" onclick="tapTempo()">TAP</div>
+
+    <div class="bpm-read">
+      <div>BPM</div>
+      <span id="bpmValue">100</span>
+    </div>
+
+  </div>
+
+  <input type="range" min="60" max="200" value="100" id="bpm">
+
+</div>
+
+<script>
+
+/* STATE */
+let mode="random";
+let running=false;
+let step=0;
+let cycle=0;
+let interval;
+let repeatValue=4;
+let grid=[];
+
+/* AUDIO (iOS FIX) */
+let ctx;
+
+function initAudio(){
+  if(!ctx){
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if(ctx.state==="suspended"){
+    ctx.resume();
+  }
+}
+
+/* SOUNDS */
+function kick(){
+  const o=ctx.createOscillator();
+  const g=ctx.createGain();
+
+  o.type="sine";
+  o.frequency.setValueAtTime(120,ctx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(50,ctx.currentTime+0.1);
+
+  g.gain.setValueAtTime(0.4,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.2);
+
+  o.connect(g);
+  g.connect(ctx.destination);
+
+  o.start();
+  o.stop(ctx.currentTime+0.2);
+}
+
+function hihat(){
+  const buffer=ctx.createBuffer(1,ctx.sampleRate*0.03,ctx.sampleRate);
+  const data=buffer.getChannelData(0);
+
+  for(let i=0;i<data.length;i++){
+    data[i]=Math.random()*2-1;
+  }
+
+  const noise=ctx.createBufferSource();
+  noise.buffer=buffer;
+
+  const filter=ctx.createBiquadFilter();
+  filter.type="highpass";
+  filter.frequency.value=6000;
+
+  const g=ctx.createGain();
+  g.gain.value=0.05;
+
+  noise.connect(filter);
+  filter.connect(g);
+  g.connect(ctx.destination);
+
+  noise.start();
+}
+
+function perc(){
+  const o=ctx.createOscillator();
+  const g=ctx.createGain();
+
+  o.type="triangle";
+  o.frequency.value=300;
+
+  g.gain.setValueAtTime(0.2,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.15);
+
+  o.connect(g);
+  g.connect(ctx.destination);
+
+  o.start();
+  o.stop(ctx.currentTime+0.15);
+}
+
+/* GRID */
+function initGrid(){
+  const g=document.getElementById("grid");
+  g.innerHTML="";
+  grid=[];
+
+  for(let i=0;i<16;i++){
+    const c=document.createElement("div");
+    c.className="cell";
+
+    c.onclick=()=>{
+      if(mode==="custom"){
+        c.classList.toggle("active");
+      }
+    };
+
+    grid.push(c);
+    g.appendChild(c);
+  }
+
+  resetGridVisual();
+}
+
+function generateRandom(){
+  grid.forEach(c=>{
+    c.classList.remove("active");
+    if(Math.random()>0.65) c.classList.add("active");
+  });
+}
+
+/* MODE */
+function setMode(m,el){
+  mode=m;
+
+  document.querySelectorAll(".mode").forEach(x=>x.classList.remove("active"));
+  el.classList.add("active");
+
+  document.body.classList.toggle("custom-mode",mode==="custom");
+
+  stop();
+  initGrid();
+
+  if(mode==="custom"){
+    document.getElementById("readyText").style.display="none";
+  }else{
+    document.getElementById("readyText").style.display="block";
+  }
+}
+
+/* BPM */
+const bpm=document.getElementById("bpm");
+const bpmValue=document.getElementById("bpmValue");
+
+bpm.oninput = () => {
+  bpmValue.innerText = bpm.value;
+
+  if (running) {
+    clearInterval(interval);
+    interval = setInterval(playStep, getSpeed());
+  }
+};
+
+function getSpeed(){
+  return (60/bpm.value)*1000/4;
+}
+
+/* START/STOP */
+function toggle(){
+  if(!running) start();
+  else stop();
+}
+
+function start(){
+  initAudio();
+
+  running=true;
+  document.getElementById("btn").innerText="STOP";
+
+  document.getElementById("readyText").style.display="none";
+
+  step=0;
+  cycle=0;
+
+  if(mode==="random"){
+    generateRandom();
+  }
+
+  interval=setInterval(playStep,getSpeed());
+}
+
+function stop(){
+  running=false;
+  clearInterval(interval);
+
+  document.getElementById("btn").innerText="START";
+
+  if(mode!=="custom"){
+    document.getElementById("readyText").style.display="block";
+  }
+
+  step=0;
+  cycle=0;
+
+  resetGridVisual();
+}
+
+/* VISUAL RESET */
+function resetGridVisual(){
+  grid.forEach(c=>{
+    c.style.opacity="0.3";
+  });
+}
+
+/* LOOP */
+function playStep(){
+
+  grid.forEach(c=>c.style.opacity="0.3");
+
+  const c=grid[step];
+
+  hihat();
+
+  if(step%4===0){
+    kick();
+  }
+
+  if(c.classList.contains("active")){
+    perc();
+  }
+
+  c.style.opacity="1";
+
+  step++;
+
+  if(step>=16){
+    step=0;
+    cycle++;
+
+    if(mode==="random" && cycle>=repeatValue){
+      generateRandom();
+      cycle=0;
+    }
+  }
+}
+
+/* REPEAT */
+function setRepeat(val,el){
+  repeatValue=val;
+
+  document.querySelectorAll(".rep").forEach(r=>r.classList.remove("active"));
+  el.classList.add("active");
+}
+
+let tapTimes = [];
+
+function tapTempo(){
+  const now = performance.now();
+
+  tapTimes.push(now);
+
+  // keep last 4 taps only
+  if(tapTimes.length > 4){
+    tapTimes.shift();
+  }
+
+  if(tapTimes.length >= 2){
+
+    const intervals = [];
+
+    for(let i=1;i<tapTimes.length;i++){
+      intervals.push(tapTimes[i] - tapTimes[i-1]);
+    }
+
+    const avg = intervals.reduce((a,b)=>a+b,0) / intervals.length;
+
+    const bpmCalc = Math.round(60000 / avg);
+
+    // clamp safe range
+    const bpmFinal = Math.max(60, Math.min(200, bpmCalc));
+
+    bpm.value = bpmFinal;
+    bpmValue.innerText = bpmFinal;
+
+    if(running){
+      clearInterval(interval);
+      interval = setInterval(playStep, getSpeed());
+    }
+  }
+}
+
+/* NAV */
+function goHome(){
+  window.location.href="playground.html";
+}
+
+/* INIT */
+initGrid();
+
+</script>
+
+</body>
+</html>
