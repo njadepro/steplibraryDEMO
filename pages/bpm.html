@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MÉTRONOME</title>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+  }
+
+  /* TOP */
+  .topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+
+    z-index: 10;
+
+    display: flex;
+    align-items: center;
+
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .back{
+    width:60px;
+    text-align:center;
+    font-size:20px;
+    cursor:pointer;
+  }
+
+  .title {
+    flex: 1;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  /* CATEGORIES */
+  .categories {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+
+    z-index: 1;
+
+    display: flex;
+    justify-content: space-around;
+
+    padding: 10px 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .cat {
+    font-size: 12px;
+    opacity: 0.4;
+    cursor: pointer;
+  }
+
+  .cat.active {
+    opacity: 1;
+    color: #1e90ff;
+    font-weight: bold;
+  }
+
+  /* CENTER */
+  .center {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+  }
+
+  #word {
+    font-size: 34px;
+    margin-bottom: 25px;
+  }
+
+  #mainBtn {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 10px;
+    background: #1e90ff;
+    color: #fff;
+  }
+
+  /* ========================= */
+  /* 🔥 NEW BOTTOM UI */
+  /* ========================= */
+
+  .bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    z-index: 9999;
+    
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 12px 14px;
+
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .bpm-control{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+
+  .tap{
+    padding:8px 12px;
+    border-radius:999px;
+
+    font-size:11px;
+    letter-spacing:1px;
+
+    background:rgba(30,144,255,0.15);
+    border:1px solid rgba(30,144,255,0.4);
+    color:#1e90ff;
+
+    cursor:pointer;
+    user-select:none;
+  }
+
+  .bpm-read{
+    display:flex;
+    flex-direction:column;
+    font-size:11px;
+    opacity:0.8;
+  }
+
+  #bpmValue{
+    font-size:14px;
+    font-weight:bold;
+    color:#fff;
+  }
+
+  .right-controls{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  input[type="range"]{
+    width:140px;
+    accent-color:#1e90ff;
+  }
+
+  .mute{
+    font-size:20px;
+    cursor:pointer;
+  }
+
+/* ===== BOTTOM ===== */
+.bottom-bar{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+
+  display:flex;
+  justify-content:space-around;
+  padding:14px 0;
+
+  background:#000;
+  border-top:1px solid rgba(255,255,255,0.1);
+}
+
+.tab{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  font-size:10px;
+  color:rgba(255,255,255,0.4);
+  gap:4px;
+  cursor:pointer;
+
+  justify-content:center;
+  font-size:10px;
+  text-align:center;
+  min-width:60px;
+}
+
+.tab svg{
+  width:22px;
+  height:22px;
+}
+
+.tab.active{
+  color:#1e90ff;
+}
+
+.tab.active svg{
+  stroke:#1e90ff;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- TOP -->
+<div class="topbar">
+  <div class="back" onclick="history.back()">←</div>
+  <div class="title">JEU DU MÉTRONOME</div>
+  <div style="width:60px;"></div>
+</div>
+
+<!-- CATEGORIES -->
+<div class="categories">
+  <div class="cat active" onclick="setCat('body', this)">CORPS</div>
+  <div class="cat" onclick="setCat('direction', this)">DIRECTION</div>
+  <div class="cat" onclick="setCat('space', this)">ESPACE</div>
+</div>
+
+<!-- CENTER -->
+<div class="center">
+  <div id="word">READY</div>
+  <button id="mainBtn" onclick="toggleGame()">START</button>
+</div>
+
+<!-- BOTTOM -->
+<div class="bottom">
+
+  <div class="bpm-control">
+
+    <div class="tap" onclick="tapTempo()">TAP</div>
+
+    <div class="bpm-read">
+      <div>BPM</div>
+      <span id="bpmValue">50</span>
+    </div>
+
+  </div>
+
+  <div class="right-controls">
+
+    <input type="range" min="40" max="220" value="50" id="bpmSlider">
+
+    <div onclick="toggleMute()" class="mute" id="mute">🔊</div>
+
+  </div>
+
+</div>
+
+<!-- BOTTOM -->
+<div class="bottom-bar">
+
+  <div class="tab" onclick="window.location='music.html'">
+    <i data-lucide="headphones"></i>
+    MUSIC
+  </div>
+
+  <div class="tab" onclick="window.location='health.html'">
+    <i data-lucide="heart-plus"></i>
+    SANTÉ
+  </div>
+
+  <div class="tab active">
+    <i data-lucide="gamepad-2"></i>
+    JOUER
+  </div>
+
+  <div class="tab" onclick="window.location='library.html'">
+    <i data-lucide="box"></i>
+    BIBLIOTHÈQUE
+  </div>
+
+  <div class="tab" onclick="window.location='dashboard.html'">
+    <i data-lucide="activity"></i>
+    PROGRESS
+  </div> 
+
+</div>
+
+<script>
+
+lucide.createIcons();
+
+/* STATE */
+let bpm = 50;
+let running = false;
+let timer;
+let activeCat = "body";
+let clickOn = true;
+let beatCount = 0;
+
+/* AUDIO */
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioContext();
+const beatsPerWord = 4;
+
+/* 🔥 CLEAN KICK (soft 808 style) */
+function playClick(){
+  if(!clickOn) return;
+
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+
+  o.type = "sine";
+
+  // punchy kick curve
+  o.frequency.setValueAtTime(140, audioCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(45, audioCtx.currentTime + 0.12);
+
+  g.gain.setValueAtTime(0.6, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
+
+  o.connect(g);
+  g.connect(audioCtx.destination);
+
+  o.start();
+  o.stop(audioCtx.currentTime + 0.18);
+}
+
+function speak(t){
+  const u = new SpeechSynthesisUtterance(t);
+  u.lang = "fr-FR";
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+/* DATA */
+const body = ["PIEDS","HANCHES","GENOUX","BUSTE","ÉPAULES","COUDES","MAINS","DOIGTS"];
+const direction = ["HAUT","BAS","GAUCHE","DROITE","AVANT","ARRIÈRE","DIAGONALE"];
+const space = ["PETIT","MOYEN","GRAND"];
+
+function pick(arr){
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+
+/* GAME */
+function toggleGame(){
+  if(!running) startGame();
+  else stopGame();
+}
+
+function startGame(){
+  running = true;
+  document.getElementById("mainBtn").innerText = "STOP";
+
+  audioCtx.resume();
+  speechSynthesis.resume();
+
+  loop();
+}
+
+function stopGame(){
+  running = false;
+  clearTimeout(timer);
+
+  document.getElementById("mainBtn").innerText = "START";
+  document.getElementById("word").innerText = "READY";
+}
+
+/* LOOP */
+function loop(){
+  if(!running) return;
+
+  playClick();
+
+  beatCount++;
+
+  if(beatCount >= beatsPerWord){
+    beatCount = 0;
+
+    let word = "";
+
+    if(activeCat === "body") word = pick(body);
+    if(activeCat === "direction") word = pick(direction);
+    if(activeCat === "space") word = pick(space);
+
+    document.getElementById("word").innerText = word;
+    speak(word);
+  }
+
+  timer = setTimeout(loop, (60/bpm)*1000);
+}
+
+/* BPM SYNC */
+const bpmSlider = document.getElementById("bpmSlider");
+const bpmValue = document.getElementById("bpmValue");
+
+bpmSlider.addEventListener("input", () => {
+  bpm = parseInt(bpmSlider.value);
+  bpmValue.innerText = bpm;
+});
+
+function changeBpm(v){
+  bpm = Math.max(40, Math.min(220, bpm + v));
+  bpmSlider.value = bpm;
+  bpmValue.innerText = bpm;
+}
+
+/* TAP TEMPO */
+let taps = [];
+
+function tapTempo(){
+  const now = performance.now();
+
+  taps.push(now);
+  if(taps.length > 4) taps.shift();
+
+  if(taps.length >= 2){
+    let intervals = [];
+
+    for(let i=1;i<taps.length;i++){
+      intervals.push(taps[i] - taps[i-1]);
+    }
+
+    const avg = intervals.reduce((a,b)=>a+b,0) / intervals.length;
+
+    bpm = Math.round(60000 / avg);
+
+    bpm = Math.max(40, Math.min(220, bpm));
+
+    bpmSlider.value = bpm;
+    bpmValue.innerText = bpm;
+  }
+}
+
+/* CATEGORY */
+function setCat(cat, el){
+  activeCat = cat;
+
+  document.querySelectorAll(".cat").forEach(c => c.classList.remove("active"));
+  el.classList.add("active");
+}
+
+/* MUTE */
+function toggleMute(){
+  clickOn = !clickOn;
+  document.getElementById("mute").innerText = clickOn ? "🔊" : "🔇";
+}
+
+</script>
+
+</body>
+</html>
