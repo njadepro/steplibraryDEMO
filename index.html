@@ -144,9 +144,9 @@ const music = document.getElementById("bg-music");
 
 const PASSWORD = "MOTRIXPROJECT";
 
-/* ================= MUSIC ================= */
+/* ================= MUSIC SYSTEM ================= */
 
-function fadeInMusic(target = 0.4, duration = 3000){
+function fadeInMusic(target = 0.04, duration = 5000){
   let step = target / (duration / 50);
 
   const fade = setInterval(() => {
@@ -159,19 +159,19 @@ function fadeInMusic(target = 0.4, duration = 3000){
 }
 
 function tryStartMusic(){
-  music.volume = 0;
+  music.volume = 0.03;
 
   const playPromise = music.play();
 
   if (playPromise !== undefined) {
     playPromise
       .then(() => {
-        fadeInMusic(0.4, 3000);
+        fadeInMusic(0.01, 8000);
       })
       .catch(() => {
 
         const unlock = () => {
-          music.play().then(() => fadeInMusic(0.4, 3000));
+          music.play().then(() => fadeInMusic(0.01, 8000));
           document.removeEventListener("click", unlock);
           document.removeEventListener("keydown", unlock);
           document.removeEventListener("touchstart", unlock);
