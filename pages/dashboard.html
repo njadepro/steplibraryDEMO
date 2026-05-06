@@ -1,0 +1,423 @@
+<!DOCTYPE html> 
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>dashboard</title>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+*{box-sizing:border-box;}
+
+body{
+  margin:0;
+  font-family:Arial;
+  background:#000;
+  color:#fff;
+  overflow:hidden;
+}
+
+.glow{
+  position:absolute;
+  width:380px;
+  height:420px;
+  z-index:-10;
+  background:#1e90ff;
+  filter:blur(160px);
+  opacity:0.18;
+  border-radius:80%;
+}
+
+/* ===== TOP HEADER ===== */
+.top-header{
+  width:100%;
+  padding:18px 16px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.02);
+  backdrop-filter:blur(10px);
+}
+
+/* centered title block */
+.header-center{
+  text-align:center;
+  margin-bottom:14px;
+}
+
+.main-title{
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:1px;
+}
+
+.sub-line{
+  font-size:12px;
+  opacity:0.5;
+  margin-top:4px;
+}
+
+/* profile row */
+.profile{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px;
+  border-radius:14px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+/* left side (avatar + name) */
+.avatar-wrap{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.avatar{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.1);
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(255,255,255,0.15);
+  cursor:pointer;
+}
+
+.avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.name-block{
+  display:flex;
+  flex-direction:column;
+}
+
+.name{
+  font-size:14px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+/* SYSTEM ACTIVE moved here */
+.system-active{
+  font-size:9px;
+  letter-spacing:1.5px;
+  padding:3px 6px;
+  border-radius:6px;
+  background:rgba(30,144,255,0.15);
+  border:1px solid rgba(30,144,255,0.3);
+  color:#1e90ff;
+}
+
+.level{
+  font-size:12px;
+  opacity:0.6;
+  margin-top:2px;
+}
+
+/* ===== CONTENT ===== */
+
+.content{
+  padding:16px 16px 120px;
+  height:100vh;
+  overflow:auto;
+}
+
+.state{
+  margin-top:14px;
+  padding:10px 12px;
+  border-radius:10px;
+  font-size:12px;
+  letter-spacing:1px;
+  background:rgba(30,144,255,0.1);
+  border:1px solid rgba(30,144,255,0.3);
+  text-align:center;
+}
+
+.session{
+  margin-top:10px;
+  font-size:12px;
+  opacity:0.7;
+  text-align:center;
+}
+
+.signals{
+  margin-top:12px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:12px;
+}
+
+.weak{opacity:0.6;}
+.strong{color:#1e90ff;}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:16px;
+}
+
+.card{
+  position:relative;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;
+  padding:14px;
+  overflow:hidden;
+  transition:0.25s ease;
+  cursor:pointer;
+}
+
+.card::after{
+  content:"";
+  position:absolute;
+  top:0;
+  right:0;
+  width:65%;
+  height:100%;
+  background:linear-gradient(to left, rgba(30,144,255,0.2), transparent);
+  opacity:0;
+  transition:0.25s ease;
+}
+
+.card:hover{
+  transform:translateY(-5px) scale(1.03);
+  border-color:#1e90ff;
+  box-shadow:0 0 25px rgba(30,144,255,0.15);
+}
+
+.card:hover::after{
+  opacity:1;
+}
+
+.card h3{
+  margin:0;
+  font-size:12px;
+  opacity:0.7;
+}
+
+.value{
+  margin-top:8px;
+  font-size:24px;
+  font-weight:800;
+}
+
+.trend{
+  font-size:12px;
+  margin-top:4px;
+  opacity:0.7;
+}
+
+.up{color:#1e90ff;}
+.down{opacity:0.5;}
+
+.balance{
+  margin-top:16px;
+  font-size:12px;
+  text-align:center;
+  opacity:0.7;
+}
+
+.focus{
+  margin-top:8px;
+  font-size:12px;
+  text-align:center;
+  color:#1e90ff;
+}
+
+.start{
+  position:fixed;
+  bottom:88px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#1e8fff91;
+  color:#fff;
+  border:1px solid rgba(255,255,255,0.10);
+  padding:12px 22px;
+  border-radius:10px;
+  font-size:12px;
+  transition:0.2s ease;
+  cursor:pointer;
+}
+
+.start:hover{
+  transform:translateX(-50%) scale(1.05);
+  background:#fff;
+  color:#1e90ff;
+  box-shadow:0 0 14px rgba(255, 255, 255, 0.16);
+}
+
+
+/* ===== BOTTOM ===== */
+.bottom-bar{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+
+  z-index: 9999;
+
+  display:flex;
+  justify-content:space-around;
+  padding:14px 0;
+
+  background:#000;
+  border-top:1px solid rgba(255,255,255,0.1);
+}
+
+.tab{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  font-size:10px;
+  color:rgba(255,255,255,0.4);
+  gap:4px;
+  cursor:pointer;
+
+  justify-content:center;
+  font-size:10px;
+  text-align:center;
+  min-width:60px;
+}
+
+.tab svg{width:22px;height:22px;}
+.tab.active{color:#1e90ff;}
+.tab.active svg{stroke:#1e90ff;}
+
+input[type=file]{display:none;}
+</style>
+</head>
+
+<body>
+
+<div class="glow"></div>
+
+<!-- HEADER -->
+<div class="top-header">
+
+  <div class="header-center">
+    <div class="main-title">TABLEAU DE BORD</div>
+    <div class="sub-line">Suivi de ton évolution</div>
+  </div>
+
+  <div class="profile">
+    <div class="avatar-wrap">
+      <label class="avatar" for="upload"></label>
+      <div class="name-block">
+        <div class="name">NOEL</div>
+        <div class="level">
+          LEVEL 3 • FLOW ARCHITECT
+          <span class="system-active">SYSTEM ACTIVE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="content">
+
+  <div class="state">STATE: FLOW RISING</div>
+
+  <div class="session">LAST SESSION • Flow state • 24 min • 148 BPM</div>
+
+  <div class="signals">
+    <div class="weak">⚠ Rhythm consistency dropping</div>
+    <div class="strong">↑ Control improving fast</div>
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+      <h3>EXPRESSION</h3>
+      <div class="value">80</div>
+      <div class="trend up">↑ improving</div>
+    </div>
+
+    <div class="card">
+      <h3>CONTROL</h3>
+      <div class="value">65</div>
+      <div class="trend up">↑ stable</div>
+    </div>
+
+    <div class="card">
+      <h3>STAMINA</h3>
+      <div class="value">62</div>
+      <div class="trend down">↓ fatigue</div>
+    </div>
+
+    <div class="card">
+      <h3>CREATIVITY</h3>
+      <div class="value">70</div>
+      <div class="trend up">↑ growing</div>
+    </div>
+
+  </div>
+
+  <div class="balance">BALANCE: EXPRESSION DOMINANT</div>
+  <div class="focus">FOCUS: MUSICALITY</div>
+
+</div>
+
+<button class="start" onclick="window.location='warmup.html'">
+  START SESSION
+</button>
+
+<!-- BOTTOM -->
+<div class="bottom-bar">
+
+  <div class="tab active">
+    <i data-lucide="activity"></i>
+    EVOLUTION
+  </div> 
+
+  <div class="tab" onclick="window.location='health.html'">
+    <i data-lucide="heart-plus"></i>
+    SANTÉ
+  </div>
+
+  <div class="tab" onclick="window.location='playground.html'">
+    <i data-lucide="gamepad-2"></i>
+    JOUER
+  </div>
+    
+  <div class="tab" onclick="window.location='music.html'">
+    <i data-lucide="headphones"></i>
+    MUSIC
+  </div>
+
+  <div class="tab" onclick="window.location='library.html'">
+    <i data-lucide="box"></i>
+    BIBLIOTHÈQUE
+  </div>
+
+</div>
+
+<script>
+lucide.createIcons();
+
+const upload = document.getElementById('upload');
+const avatarImg = document.getElementById('avatarImg');
+
+upload.addEventListener('change', function(){
+  const file = this.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = e => avatarImg.src = e.target.result;
+    reader.readAsDataURL(file);
+  }
+});
+</script>
+
+</body>
+</html>
